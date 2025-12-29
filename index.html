@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warung DS Jaya - Belanja Sembako Mudah</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #25D366; /* Hijau WhatsApp */
+            --accent-color: #ffc107; /* Kuning Cerah */
+            --dark-color: #128C7E;
+        }
+        body { 
+            font-family: 'Lexend', sans-serif; 
+            background-color: #f0f2f5; 
+        }
+        .navbar { background-color: white !important; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .navbar-brand { color: #128C7E !important; font-weight: 700; font-size: 1.5rem; }
+        
+        .hero {
+            background: linear-gradient(135deg, #128C7E 0%, #25D366 100%);
+            color: white;
+            padding: 50px 0;
+            border-radius: 0 0 40px 40px;
+            margin-bottom: 30px;
+        }
+
+        .card-product {
+            border: none;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .card-product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .img-container {
+            height: 160px;
+            overflow: hidden;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #eee;
+        }
+        .img-container img {
+            max-width: 80%;
+            max-height: 80%;
+            object-fit: contain;
+        }
+        .btn-add {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+        }
+        .btn-add:hover { background-color: var(--dark-color); color: white; }
+        
+        /* Floating Cart */
+        .cart-box {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            z-index: 1000;
+        }
+        .btn-cart {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            position: relative;
+            border: none;
+        }
+        .badge-count {
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            background: #ff3b30;
+            color: white;
+            font-size: 11px;
+            border-radius: 50%;
+            padding: 4px 7px;
+            font-weight: bold;
+            border: 2px solid white;
+        }
+        .product-price { color: #e67e22; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg sticky-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">🏪 Warung DS Jaya</a>
+        <div class="ms-auto d-none d-md-block">
+            <small class="text-muted">Jl. Raya No. 123 | Buka 07:00 - 21:00</small>
+        </div>
+    </div>
+</nav>
+
+<header class="hero text-center">
+    <div class="container px-4">
+        <h1 class="fw-bold">Belanja Harian Beres!</h1>
+        <p class="opacity-75">Pilih produk, pesan lewat WhatsApp, barang kami siapkan.</p>
+    </div>
+</header>
+
+<div class="container mb-5">
+    <h5 class="fw-bold mb-4">Katalog Produk Sembako</h5>
+    <div class="row g-3 g-md-4" id="display-produk">
+        </div>
+</div>
+
+<div class="cart-box">
+    <button class="btn btn-cart btn-success" data-bs-toggle="modal" data-bs-target="#cartModal">
+        🛒 <span class="badge-count" id="count-display">0</span>
+    </button>
+</div>
+
+<div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 20px; border: none;">
+            <div class="modal-header border-0 bg-light" style="border-radius: 20px 20px 0 0;">
+                <h5 class="modal-title fw-bold">Pesanan Anda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cart-items-list">
+                    <p class="text-center text-muted">Belum ada barang dipilih.</p>
+                </div>
+                <hr class="my-4">
+                <div class="d-flex justify-content-between align-items-center fw-bold fs-5">
+                    <span>Total:</span>
+                    <span id="total-price" class="text-success">Rp 0</span>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Tambah Lagi</button>
+                <button type="button" class="btn btn-success px-4" onclick="checkoutWA()">
+                    Kirim Pesanan ke WA
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="bg-white text-center py-4 mt-5 border-top">
+    <div class="container">
+        <p class="mb-1 fw-bold">Warung DS Jaya</p>
+        <p class="text-muted small">Belanja nyaman, harga teman.</p>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    const WA_NUMBER = "6281224351085";
+    
+    // Daftar Produk Umum Warung
+    const products = [
+        { id: 1, name: "Beras Rojolele 5kg", price: 68000, img: "https://cdn-icons-png.flaticon.com/512/3050/3050212.png" },
+        { id: 2, name: "Minyak Goreng 1L", price: 18000, img: "https://cdn-icons-png.flaticon.com/512/1155/1155255.png" },
+        { id: 3, name: "Telur Ayam (1/2kg)", price: 15000, img: "https://cdn-icons-png.flaticon.com/512/2613/2613146.png" },
+        { id: 4, name: "Indomie Goreng", price: 3500, img: "https://cdn-icons-png.flaticon.com/512/3461/3461936.png" },
+        { id: 5, name: "Gula Pasir 1kg", price: 17000, img: "https://cdn-icons-png.flaticon.com/512/5029/5029236.png" },
+        { id: 6, name: "Kopi Sachet (Isi 10)", price: 15000, img: "https://cdn-icons-png.flaticon.com/512/924/924514.png" },
+        { id: 7, name: "Sabun Cuci Piring", price: 5000, img: "https://cdn-icons-png.flaticon.com/512/2553/2553642.png" },
+        { id: 8, name: "Garam Dapur", price: 3000, img: "https://cdn-icons-png.flaticon.com/512/4117/4117079.png" }
+    ];
+
+    let cart = [];
+
+    function renderProducts() {
+        const container = document.getElementById('display-produk');
+        container.innerHTML = products.map(p => `
+            <div class="col-6 col-md-4 col-lg-3">
+                <div class="card card-product h-100">
+                    <div class="img-container p-2">
+                        <img src="${p.img}" alt="${p.name}">
+                    </div>
+                    <div class="card-body d-flex flex-column text-center">
+                        <h6 class="fw-bold small mb-2">${p.name}</h6>
+                        <p class="product-price fw-bold mb-3">Rp ${p.price.toLocaleString('id-ID')}</p>
+                        <button class="btn btn-add btn-sm mt-auto" onclick="addToCart(${p.id})">+ Keranjang</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addToCart(id) {
+        const product = products.find(p => p.id === id);
+        const inCart = cart.find(item => item.id === id);
+
+        if (inCart) {
+            inCart.qty++;
+        } else {
+            cart.push({ ...product, qty: 1 });
+        }
+        updateUI();
+    }
+
+    function updateUI() {
+        const countDisplay = document.getElementById('count-display');
+        const cartList = document.getElementById('cart-items-list');
+        const totalPriceDisplay = document.getElementById('total-price');
+        
+        let totalItems = cart.reduce((acc, curr) => acc + curr.qty, 0);
+        countDisplay.innerText = totalItems;
+
+        if (cart.length === 0) {
+            cartList.innerHTML = '<p class="text-center text-muted">Belum ada barang dipilih.</p>';
+            totalPriceDisplay.innerText = 'Rp 0';
+            return;
+        }
+
+        let totalHarga = 0;
+        cartList.innerHTML = cart.map(item => {
+            totalHarga += (item.price * item.qty);
+            return `
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <span class="fw-bold d-block" style="font-size: 0.9rem;">${item.name}</span>
+                        <small class="text-muted">${item.qty} x Rp ${item.price.toLocaleString('id-ID')}</small>
+                    </div>
+                    <span class="fw-bold text-dark">Rp ${(item.price * item.qty).toLocaleString('id-ID')}</span>
+                </div>
+            `;
+        }).join('');
+        
+        totalPriceDisplay.innerText = `Rp ${totalHarga.toLocaleString('id-ID')}`;
+    }
+
+    function checkoutWA() {
+        if (cart.length === 0) return alert("Pilih barang dulu ya!");
+
+        let pesan = `*PESANAN BARU - WARUNG DS JAYA*\n`;
+        pesan += `------------------------------------------\n`;
+        let total = 0;
+
+        cart.forEach((item, index) => {
+            pesan += `${index + 1}. *${item.name}* (${item.qty}x)\n`;
+            total += (item.price * item.qty);
+        });
+
+        pesan += `------------------------------------------\n`;
+        pesan += `*Total: Rp ${total.toLocaleString('id-ID')}*\n\n`;
+        pesan += `Mohon segera diproses ya, terima kasih!`;
+        
+        const encodedPesan = encodeURIComponent(pesan);
+        const waLink = `https://wa.me/${WA_NUMBER}?text=${encodedPesan}`;
+        
+        window.open(waLink, '_blank');
+    }
+
+    renderProducts();
+</script>
+</body>
+</html>
